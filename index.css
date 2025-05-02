@@ -1,7 +1,31 @@
-    html{
-        font-family: 'Times New Roman', Times, serif
-        ;
+    *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
     body{
-        color: rgb(201, 228, 252);
+        background-color: rgb(19, 44, 2);
+        
+}
+
+    #plateau{
+        background: rgb(0, 58, 167);
+        width: 200px;
+        height: 200px;
+        margin: auto;
+        margin-top: 200px;
+}
+    table{
+        border: solid 1px;
+        border-collapse: collapse;
+}
+    td{
+        border: solid 1px;
+        width: 20rem;
+        height: 4.15rem;
+        text-align: center;
+}
+    tr{
+        border: solid 1px;
 }
