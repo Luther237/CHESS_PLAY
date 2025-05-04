@@ -1,20 +1,24 @@
   function cellule(x, y, i, c){
     this.x_position = x,
     this.y_position = y,
-    this.background = i,
-    this.color = c;
+    this.id = document.getElementById(x + "" + y);
+    this.color = function(){
+      document.getElementById(id).color = c;
+    },
+    this.background = function(){
+      document.getElementById(id).style.background = i;
+    }
   }
+
   let plateau = new Array(3);
   for(let i=0; i<plateau.length; i++){
-    tab[i] = new Array(3)
+    plateau[i] = new Array(3)
   }
+  console.log(plateau)
 
   for(let i=0; i<plateau.length; i++){
     for(let j=0; j<plateau.length; j++){
-      id = i + "" + j;
-      plateau[i][j] = document.getElementById(id);
+      plateau[i][j] = new cellule(j, i, "red", "red");  
     } 
   }
-  plateau[0][0].innerHtml = "B";
-  console.log(id);
 
