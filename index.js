@@ -6,64 +6,86 @@ var tab = new Array(8);
 for(let i=0; i<tab.length; i++){
   tab[i] = new Array(8);
 }
-//Variable administrateur
+//Variables du jeu
 var data_play = {
   number_active: 0
 };
+//Définir prototype de pièce
+function Piece(nom, valeur, couleur, x_position, y_position){
+  this.nom = nom; 
+  this.image = `./img/${nom}_${couleur}.png`;
+  this.valeur = valeur;
+  this.couleur = couleur;
+  //Définir le joueur possedant la pièce
+  if(couleur == "noir"){
+    this.joueur = 2
+  }else{
+    this.joueur = 1
+  }
+  //Définir les variables de position
+  this.x_position = x_position;
+  this.y_position = y_position;
+  //Définir les déplacements possibles
+
+};
+//Définir le prototype d'une cellule de tab
+function Tab_cel(cellule, piece){
+  this.html_cel = cellule;
+  this.piece = piece;
+}
+
+var pion = new Piece("pion", 1, "noir") 
+
+console.log(pion)                     
+
+//Définir chaque type de pièce
+
+
 //remplissage et définition des méthodes des cellules
 for(let i=0; i<tab.length; i++){
+  //Parcours des lignes
   tab[i] = document.createElement("tr");
   tab[i].classList = "row_table";
+  tab[i].id = `row ${i}`
   table.appendChild(tab[i]);
+  //Parcour des cellules
   for(let j=0; j<tab.length; j++){
-    tab[i][j] = document.createElement("td");
-    tab[i][j].classList = "cellule";
-    tab[i].appendChild(tab[i][j]);
-    tab[i][j].id = `${i}${j}`;
-    tab[i][j].is_clicked = true;
-    //Ajout de la propriété pièce dans le tableau
-    tab[i][j].piece = {
-      image: null,
-      type: null,
-    };
+    //Les elements de tab ont des obj {cellule_correspondante, piece_contenue...}
+    //Définition de l'objet tab[i][j]
+    var cellule = document.createElement("td");
+    tab[i][j] = new Tab_cel(cellule);
+    tab[i][j].html_cel.classList = "cellule";
+    tab[i].appendChild(tab[i][j].html_cel);
+    tab[i][j].html_cel.id = `${i}${j}`;
     //Alterne les couleurs des cases
-      if((i+j)%2 == 0){
-        tab[i][j].style.background = "green";
-        tab[i][j].defaut_color = "green"
-      }else{
-        tab[i][j].style.background = "red";
-        tab[i][j].defaut_color = "red"
-       }
-    //Définition des fonctions
-    tab[i][j].onclick = () => clique(i,j);
+    if((i+j)%2 == 0){
+      tab[i][j].html_cel.style.background = "green";
+      tab[i][j].html_cel.defaut_color = "green"
+    }else{
+      tab[i][j].html_cel.style.background = "red";
+      tab[i][j].html_cel.defaut_color = "red"
+     }
 
+    //Définition des images pour chaque case du tableau
+    tab[i][j].html_cel.image = document.createElement("img");
+    tab[i][j].html_cel.appendChild(tab[i][j].html_cel.image)
+    
+    
+    //Définition des fonctions
+    tab[i][j].html_cel.onclick = () => {
+      console.log(tab[i][j].piece);
+    };
   }
 }
+//Définir les positions initiales 
+  //pions
+  for(let i=0; i<tab.length; i++){
+    tab[1][i].piece = new Piece("pion", 1, "noir")
+    console.log("Ajour sucess")
+  }
+
+  /*
   //DEFINIR LES POSITIONS INITIALES DES PIÈCES
-    //pions noirs
-    for(let i = 0; i<tab.length; i++){
-      define_position(1, i, "./img/pion_noir.png", "paw")
-    }
-    //Pions blancs
-    for(let i = 0; i<tab.length; i++){
-      define_position(6, i, "./img/pion_blanc.png", "paw")
-    }
-    //Tours noires
-    define_position(0, 0, "./img/tour_noire.png", "rock");
-    define_position(0, 7, "./img/tour_noire.png", "rock");
-    //Fou noir
-    define_position(0, 2, "./img/fou_noir.png", "bishop");
-    define_position(0, 5, "./img/fou_noir.png", "bishop");
-    //Cavalier noir
-    define_position(0, 1, "./img/cavalier_noir.png", "knight");
-    define_position(0, 6, "./img/cavalier_noir.png", "knight");
-    //Dame noire
-    define_position(0, 3, "./img/dame_noir.png", "queen");
-    //Rois
-    define_position(0, 4, "./img/roi_noir.png", "king");
-    
-    define_position(5, 5, "./img/dame_noir.png", "dame")
-    define_position(5, 5, null, "dame")
 
   //FONCTION ON CLICK
   function clique(x, y){
@@ -74,7 +96,6 @@ for(let i=0; i<tab.length; i++){
       data_play.first_active.y_position = y; 
       tab[x][y].style.background =" rgb(73, 6, 1)";
       tab[x][y].is_clicked = false;
-      console.log(tab[x][y].piece)
     }else{
       data_play.second_active = tab[x][y];
       data_play.second_active.x_position = x;
@@ -83,9 +104,7 @@ for(let i=0; i<tab.length; i++){
       tab[x][y].is_clicked = true;
       tab[x][y].style.background = tab[x][y].defaut_color;
       data_play.first_active.style.background = data_play.first_active.defaut_color;
-      console.log(tab[x][y].piece) 
-      permutter(data_play.first_active, data_play.second_active);
-    }
+      }
   }
 
   //Fonction pour PERMUTTER deux OBJETS
@@ -120,3 +139,4 @@ for(let i=0; i<tab.length; i++){
 //Variables obsolètes
 //=Celllule.isclicked (1)
 //-cellule.piece.x|y_position (3)
+*/
