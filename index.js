@@ -22,7 +22,10 @@ for(let i=0; i<tab.length; i++){
     tab[i][j].id = `${i}${j}`;
     tab[i][j].is_clicked = true;
     //Ajout de la propriété pièce dans le tableau
-    tab[i][j].piece = {};
+    tab[i][j].piece = {
+      image: null,
+      type: null,
+    };
     //Alterne les couleurs des cases
       if((i+j)%2 == 0){
         tab[i][j].style.background = "green";
@@ -59,28 +62,61 @@ for(let i=0; i<tab.length; i++){
     //Rois
     define_position(0, 4, "./img/roi_noir.png", "king");
     
+    define_position(5, 5, "./img/dame_noir.png", "dame")
+    define_position(5, 5, null, "dame")
 
-    //fONCTION POUR DEFINIR UNE POSITION INITIALE
-    function define_position(x, y, s, t){
-      tab[x][y].piece.image = document.createElement("img");
-      tab[x][y].piece.image.src = s;
-      tab[x][y].appendChild(tab[x][y].piece.image);
-      tab[x][y].piece.type = t;
-      tab[x][y].piece.x_position = x;
-      tab[x][y].piece.y_position = y;
-    }
-      
   //FONCTION ON CLICK
   function clique(x, y){
-    
-    var cellule = tab[x][y];
-    if(tab[x][y].is_clicked == true){
+    if(data_play.number_active == 0){
+      data_play.first_active = tab[x][y];
+      data_play.number_active++;
+      data_play.first_active.x_position = x;
+      data_play.first_active.y_position = y; 
       tab[x][y].style.background =" rgb(73, 6, 1)";
       tab[x][y].is_clicked = false;
+      console.log(tab[x][y].piece)
     }else{
+      data_play.second_active = tab[x][y];
+      data_play.second_active.x_position = x;
+      data_play.second_active.y_position = y;
+      data_play.number_active = 0
       tab[x][y].is_clicked = true;
       tab[x][y].style.background = tab[x][y].defaut_color;
+      data_play.first_active.style.background = data_play.first_active.defaut_color;
+      console.log(tab[x][y].piece) 
+      permutter(data_play.first_active, data_play.second_active);
     }
   }
 
-console.log(tab[1][1].piece)
+  //Fonction pour PERMUTTER deux OBJETS
+  function permutter(x,y){
+    let temp = {...x.piece};
+    Object.assign(x.piece, y.piece);
+    Object.assign(y.piece, temp) 
+  }
+  //Fonction pour définir la position d'une piece
+  function define_position(x, y, s, t){
+    let pi = tab[x][y].piece;
+    if(s == null){  
+      let imag = document.getElementById(`image ${x}${y}`);
+      tab[x][y].removeChild(imag); 
+      tab[x][y].piece = {...{
+        image: null,
+        type: null
+      }}
+      console.log("source nulle")
+    }else{
+      if(pi.image == null){
+          pi.image = document.createElement("img");
+          pi.image.src = s;
+          pi.image.id = `image ${x}${y}`;
+          tab[x][y].appendChild(tab[x][y].piece.image);
+          pi.type = t;
+      }else{
+          document.getElementById(`image ${x}${y}`).src = s;
+      }
+    }
+  } 
+//Variables obsolètes
+//=Celllule.isclicked (1)
+//-cellule.piece.x|y_position (3)
