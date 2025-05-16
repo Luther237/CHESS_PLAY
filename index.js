@@ -8,8 +8,6 @@ for(let i=0; i<tab.length; i++){
 }
 //Variables du jeu
 var data_play = {
-  first_active : Object,
-  second_active : Object,
   number_active: 0
 };
 //Définir prototype de pièce
@@ -29,6 +27,8 @@ function Piece(nom, valeur, couleur, x_position, y_position){
     this.joueur = 0
   };
   //Définir les déplacements possibles
+  //Accès aux données
+  //Données de déplacement
   
   //Fonction de deplacement
 };
@@ -70,10 +70,12 @@ for(let i=0; i<tab.length; i++){
       tab[i][j].piece = new Piece("pion", 1, "blanc", j, i);
      }else if(i<7 && i>1){
       tab[i][j].piece = new Piece("undefine", 0, "", j, i);
+      var empty_piece = new Piece("undefine", 0, "", 100, 100);
+    
      }
     
     //Définition des fonctions
-    tab[i][j].html_cel.addEventListener("click", () => cliquer(tab[i][j]));
+    tab[i][j].html_cel.addEventListener("click",() => cliquer(tab[i][j]));
     //Définir la valeur en image de chaque case
     tab[i][j].html_cel.image = document.createElement("img");
     tab[i][j].html_cel.appendChild(tab[i][j].html_cel.image)
@@ -85,7 +87,7 @@ tab[0][0].piece = new Piece("tour", 4, "noir", 0, 0);
 tab[0][7].piece = new Piece("tour", 4, "noir", 7, 0);
 tab[7][0].piece = new Piece("tour", 4, "blanc", 1, 0);
 tab[7][7].piece = new Piece("tour", 4, "blanc", 7, 7);
-//Cavaliert
+//Cavalier
 tab[0][1].piece = new Piece("cavalier", 3, "noir", 1, 0);
 tab[0][6].piece = new Piece("cavalier", 3, "noir", 6, 0);
 tab[7][1].piece = new Piece("cavalier", 3, "blanc", 1, 7);
@@ -104,40 +106,69 @@ tab[0][4].piece = new Piece("roi", 100, "noir", 4, 0);
 tab[7][4].piece = new Piece("roi", 100, "blanc", 4, 7);
 
 //Fonction pour raffraichir le jeu au cas où ce n'est pas automatique
-function refresh(){
-  for(let i = 0; i<tab.length; i++){
-    for(let j = 0; j<tab.length; j++){
-    tab[i][j].html_cel.image.src = tab[i][j].piece.image_src;
-    }
-  }
-}
+var refresh = (
+  function(){
+    return function(){
+      for(let i = 0; i<tab.length; i++){
+        for(let j = 0; j<tab.length; j++){
+        tab[i][j].html_cel.image.src = tab[i][j].piece.image_src;
+        }
+      }
+    };
+})();
 refresh();
 //L'ENVIRONNEMENT DU JEU A FINIT D'ETRE CODÉ
 //JE PASSE AU DEPLACEMENT
 
 //Fonction evennement cliquer
 function cliquer(el){
-  if(data_play.number_active == 0){
-    data_play.first_active = el; 
-    data_play.number_active++; 
+  if(data_play.number_active == 0 && el.piece.valeur != 0 ){
+    console.log(" first click");
     el.html_cel.style.background = "yellow";
-  }else{
-    data_play.second_active = el;
+    data_play.first_active = el;
+    data_play.number_active = 1;
+    console.log(el.piece.valeur)
+  }else if(data_play.number_active == 1){
+    console.log("second click")
+    console.log(el.piece.valeur)
+    let src = data_play.first_active;
+    let des = el;
+    console.log(des.piece.valeur)
+    if(src != des){
+      deplacer(src, des);
+    }
+    src.html_cel.style.background = src.html_cel.defaut_color;
     data_play.number_active = 0;
-    data_play.first_active.html_cel.style.background = data_play.first_active.html_cel.defaut_color;
-    permutter_var(data_play.first_active.piece.y_position, data_play.second_active.piece.y_position)
-    permutter_var(data_play.first_active.piece.x_position, data_play.second_active.piece.xm_position)
-    permutter(data_play.first_active, data_play.second_active)
-  };
+  }
 }
 //Fonction pour PERMUTTER deux OBJETS
-function permutter(x,y){
-  let temp = {...x.piece};
-  Object.assign(x.piece, y.piece);
-  Object.assign(y.piece, temp) 
+function deplacer(x,y){
+  if(x.piece.joueur != y.piece.joueur ){
+    if(!y.piece.valeur){
+      console.log("début consition ssn")
+      console.log(y.piece.valeur)
+      let temp = {...x.piece};
+      Object.assign(x.piece, y.piece);
+      Object.assign(y.piece, temp) 
+      x.html_cel.image.src = x.piece.image_src;
+      y.html_cel.image.src = y.piece.image_src;
+      [x.piece.x_position, x.piece.y_position] = [parseInt(x.html_cel.id[1]), parseInt(x.html_cel.id[0])];
+      [y.piece.x_position, y.piece.y_position] = [parseInt(y.html_cel.id[1]), parseInt(y.html_cel.id[0])];
+    }else{
+      capture(x, y)
+    }
+  }else{
+    console.log("Déplacement impossible");
+  }
+}
+//Fonction capture piece 
+function capture(x, y){
+  Object.assign(y.piece, x.piece)
+  Object.assign(x.piece, empty_piece); 
   x.html_cel.image.src = x.piece.image_src;
   y.html_cel.image.src = y.piece.image_src;
-  x.piece.x_position = 5;
+  [x.piece.x_position, x.piece.y_position] = [parseInt(x.html_cel.id[1]), parseInt(x.html_cel.id[0])];
+  [y.piece.x_position, y.piece.y_position] = [parseInt(y.html_cel.id[1]), parseInt(y.html_cel.id[0])];  
 }
 function permutter_var(x,y){
   console.log(`init xinit = ${x}  xinit = ${y}`)
@@ -148,3 +179,4 @@ function permutter_var(x,y){
   y = temp;
   console.log(`y = ${y}`)
 }
+console.log(tab[1][1]);
