@@ -18,6 +18,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
   this.couleur = couleur;
   this.x_position = x_position;
   this.y_position = y_position;
+  this.number_move = 0;
   //Définir le joueur possedant la piece
   if(couleur == "noir"){
     this.joueur = 2
@@ -27,10 +28,48 @@ function Piece(nom, valeur, couleur, x_position, y_position){
     this.joueur = 0
   };
   //Définir les déplacements possibles
-  //Accès aux données
-  //Données de déplacement
-  
-  //Fonction de deplacement
+  this.possible_moves = function (){
+    let possible_tab = new Array(0);
+    let facteur_joueur = Math.pow(-1, this.joueur);
+    switch(this.nom){
+      case("pion"):
+        if(checkCase(this.x_position, this.y_position + facteur_joueur)){
+          possible_tab.push(`${this.y_position + facteur_joueur}${this.x_position}`);
+        }
+        if(this.number_move == 0){
+          if(checkCase(this.x_position, this.y_position + 2*facteur_joueur) == 1)
+            possible_tab.push(`${this.y_position + 2*facteur_joueur}${this.x_position}`)  
+          }
+        //Vérifie si les diagonales sont vides
+        let y = this.y_position + facteur_joueur
+        if(y < tab.length && y>0){
+          if(tab[y][this.x_position - 1].piece.valeur != 0 && tab[y][this.x_position - 1].piece.joueur != this.joueur){
+            possible_tab.push(`${y}${this.x_position - 1}`);
+          }
+          if(tab[y][this.x_position + 1].piece.valeur != 0 && tab[y][this.x_position - 1].piece.joueur != this.joueur){
+            possible_tab.push(`${y}${this.x_position + 1}`);
+          }
+        }
+        //Le coup en passant
+        break;
+      case("fou"):
+      console.log("c'est un fou")
+        let i = this.x_position + 1; j=this.y_position + 1;
+        while (i<8 && j<8 && checkCase(i, j)) {
+          possible_tab.push(`${j}${i}`)
+          i++; j++;
+        }
+        var i2 = this.x_position - 1; j2 = this.y_position + 1;
+        while (i2>=0 && j2>=0 && checkCase(i2, j2) ) {
+          possible_tab.push(`${j2}${i2}`)
+          i2--; j2--;
+        }
+        
+      
+      break;
+    }
+    return possible_tab;
+  }
 };
 //Définir le PROTOTYPE d'une cellule de tab
 function Tab_cel(cellule, piece){
@@ -55,11 +94,11 @@ for(let i=0; i<tab.length; i++){
     tab[i][j].html_cel.id = `${i}${j}`;
     //Alterne les couleurs des cases
     if((i+j)%2 == 0){
-      tab[i][j].html_cel.style.background = "green";
-      tab[i][j].html_cel.defaut_color = "green"
+      tab[i][j].html_cel.style.background = "rgba(248, 203, 163, 0.53)";
+      tab[i][j].html_cel.defaut_color = "rgba(248, 203, 163, 0.53)"
     }else{
-      tab[i][j].html_cel.style.background = "red";
-      tab[i][j].html_cel.defaut_color = "red"
+      tab[i][j].html_cel.style.background = "rgba(111, 0, 155, 0.85)";
+      tab[i][j].html_cel.defaut_color = "rgba(111, 0, 155, 0.85)";
      }
    
     //Valeurs initiales
@@ -122,19 +161,19 @@ refresh();
 
 //Fonction evennement cliquer
 function cliquer(el){
+  display_piece(el);
   if(data_play.number_active == 0 && el.piece.valeur != 0 ){
-    console.log(" first click");
-    el.html_cel.style.background = "yellow";
+    //Aficher les deplacements possibles de la piece sur laquelle on clique
+    disPossible(el)
+    el.html_cel.style.background = "rgba(224, 185, 8, 0.85)";
     data_play.first_active = el;
     data_play.number_active = 1;
-    console.log(el.piece.valeur)
   }else if(data_play.number_active == 1){
-    console.log("second click")
-    console.log(el.piece.valeur)
+    //remmetre tout à son état initial
+    disPossible_refresh(data_play.first_active)
     let src = data_play.first_active;
     let des = el;
-    console.log(des.piece.valeur)
-    if(src != des){
+    if(src != des && find_el(src.piece.possible_moves(), des.html_cel.id) == 1){
       deplacer(src, des);
     }
     src.html_cel.style.background = src.html_cel.defaut_color;
@@ -145,8 +184,7 @@ function cliquer(el){
 function deplacer(x,y){
   if(x.piece.joueur != y.piece.joueur ){
     if(!y.piece.valeur){
-      console.log("début consition ssn")
-      console.log(y.piece.valeur)
+      x.piece.number_move++;
       let temp = {...x.piece};
       Object.assign(x.piece, y.piece);
       Object.assign(y.piece, temp) 
@@ -163,6 +201,7 @@ function deplacer(x,y){
 }
 //Fonction capture piece 
 function capture(x, y){
+  x.piece.number_move++;
   Object.assign(y.piece, x.piece)
   Object.assign(x.piece, empty_piece); 
   x.html_cel.image.src = x.piece.image_src;
@@ -170,13 +209,49 @@ function capture(x, y){
   [x.piece.x_position, x.piece.y_position] = [parseInt(x.html_cel.id[1]), parseInt(x.html_cel.id[0])];
   [y.piece.x_position, y.piece.y_position] = [parseInt(y.html_cel.id[1]), parseInt(y.html_cel.id[0])];  
 }
-function permutter_var(x,y){
-  console.log(`init xinit = ${x}  xinit = ${y}`)
-  let temp = x;
-  console.log(`temp = ${temp}`)
-  x = y;
-  console.log(`x = ${x}`)
-  y = temp;
-  console.log(`y = ${y}`)
+
+//Fonction pour afficher la piece sur laquelle on clique
+function display_piece(element){
+  document.getElementById("id_image").src = element.piece.image_src;
+  document.getElementById("nom").innerHTML = `nom: ${element.piece.nom}`;
+  document.getElementById("joueur").innerHTML = `joueur: ${element.piece.joueur}`
+  document.getElementById("valeur").innerHTML = `valeur ${element.piece.valeur}`
+  document.getElementById("nombre_move").innerHTML = `nombre move: ${element.piece.number_move}`
+  document.getElementById("x").innerHTML = `x: ${element.piece.x_position}`
+  document.getElementById("y").innerHTML = `y: ${element.piece.y_position}`
+  document.getElementById("pm").innerHTML = `pm: ${element.piece.possible_moves()}`
+};
+
+//Fonction pour retouver un élément dans un tableau
+const find_el = (tableau, searched) => {
+  let l  = tableau.length; 
+  for(let i = 0 ; i< l; i++){
+    if(tableau[i] == searched)
+      return 1
+  }
+  return -1
 }
-console.log(tab[1][1]);
+//Fonction pour retrouver si une case est vide 
+const checkCase = (x, y) => {
+  console.log("check case")
+  console.log(tab[y][x].html_cel)
+  if(tab[y][x].piece.valeur == 0){
+    console.log("vide")
+    return 1
+  }
+  console.log("occupée")
+  return 0;
+}
+//Function display_possible moves
+function disPossible(el){
+  el.piece.possible_moves().forEach(move => {
+    tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "solid rgba(226, 218, 223, 0.99)";
+  });
+}
+function disPossible_refresh(el){
+  el.piece.possible_moves().forEach(move => {
+    tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "none";
+  });
+}
+deplacer(tab[0][2], tab[4][2])
+  console.log(tab[1][3].piece.valeur);
