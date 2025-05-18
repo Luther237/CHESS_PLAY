@@ -33,26 +33,56 @@ function Piece(nom, valeur, couleur, x_position, y_position){
     let facteur_joueur = Math.pow(-1, this.joueur);
     switch(this.nom){
       case("pion"):
-      //Définition du premier coup
-      if(checkLimites(this.y_position + facteur_joueur) == 0 && checkLimites(this.x_position) == 0) {
-        possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position}`);
-      }
-      if(checkLimites(this.y_position + 2 * facteur_joueur) == 0 && checkLimites(this.x_position) == 0 && this.number_move == 0) {
-            possible_tab_temp.push(`${this.y_position + 2 * facteur_joueur}${this.x_position}`);
-      }
-        //Vérification des diagonales
-          if(checkLimites(this.x_position - 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position - 1].piece.valeur != 0) && (tab[this.y_position + facteur_joueur][this.x_position - 1].piece.joueur != this.joueur)) {
-            possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position - 1}`)
-          }
-          if(checkLimites(this.x_position + 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position + 1].piece.valeur != 0) && (tab[this.y_position + facteur_joueur][this.x_position + 1].piece.joueur != this.joueur)){
-            possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position + 1}`) 
-          }
-        
-        //Vérifier les cases 
-        var tableau_final = checkCase(possible_tab_temp, this);
-        //LE COUP EN PASSANT
+        //Définition du premier coup
+        if(checkLimites(this.y_position + facteur_joueur) == 0 && checkLimites(this.x_position) == 0) {
+          possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position}`);
+        }
+        if(checkLimites(this.y_position + 2 * facteur_joueur) == 0 && checkLimites(this.x_position) == 0 && this.number_move == 0) {
+              possible_tab_temp.push(`${this.y_position + 2 * facteur_joueur}${this.x_position}`);
+        }
+          //Vérification des diagonales
+            if(checkLimites(this.x_position - 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position - 1].piece.valeur != 0) && (tab[this.y_position + facteur_joueur][this.x_position - 1].piece.joueur != this.joueur)) {
+              possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position - 1}`)
+            }
+            if(checkLimites(this.x_position + 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position + 1].piece.valeur != 0) && (tab[this.y_position + facteur_joueur][this.x_position + 1].piece.joueur != this.joueur)){
+              possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position + 1}`) 
+            }
+          //LE COUP EN PASSANT
+        return checkCase(possible_tab_temp, this);
 
-        return tableau_final;
+      case("fou"):
+          let i = 0;
+          possible_tab_temp.push(`${this.y_position}${this.x_position}`);
+          let x_fou = this.x_position + 1;
+          let y_fou = this.y_position + 1;
+          while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
+            possible_tab_temp.push(`${y_fou}${x_fou}`);
+            x_fou++;
+            y_fou++;
+          }
+          y_fou = this.y_position + 1;
+          x_fou = this.x_position - 1;
+          while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
+            possible_tab_temp.push(`${y_fou}${x_fou}`);
+            x_fou--;
+            y_fou++;
+          }
+          x_fou = this.x_position - 1
+          y_fou = this.y_position - 1;
+          while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
+            possible_tab_temp.push(`${y_fou}${x_fou}`);
+            x_fou--;
+            y_fou--;
+          }
+          y_fou = this.y_position - 1;
+          x_fou = this.x_position + 1;
+          while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
+            possible_tab_temp.push(`${y_fou}${x_fou}`);
+            x_fou++;
+            y_fou--;
+          }
+
+        return checkCase(possible_tab_temp, this);
       }
   }
 };
@@ -219,22 +249,64 @@ const find_el = (tableau, searched) => {
 //Fonction pour retrouver si une case est vide 
 function checkCase(possiblechecking, piece_ref){
   let return_tab = new Array(0);
+  //je fais le check des cases voisinnes
+  
   possiblechecking.forEach(cases => {
     let y = parseInt(cases[0]);
     let x = parseInt(cases[1])
-    if((checkLimites(x) == 0) && (checkLimites(y) == 0)){
       //si c'est un pion, on check les diagonales
       if(piece_ref.nom =="pion" && x != piece_ref.x_position && tab[y][x].piece.valeur != 0 && tab[y][x].piece.joueur != piece_ref.joueur ){
         return_tab.push(`${y}${x}`)
       }
-
-      //on teste si la case pointée est vide 
+      let a;
+      //on teste si la case pointée est vide
+      let i,j;  
+      let px = piece_ref.x_position;
+      let py = piece_ref.y_position; 
       if(!tab[y][x].piece.valeur){
         return_tab.push(`${y}${x}`)
+        //si la case suivante pointée n'est pas vide
+        //On vérifie si la case suivante est non vide, si c'est la cas, on l'ajoute c'est le cas pour les fous, la dame et la tour
+        if(piece_ref.nom == "fou"){
+          if(x>px){ i = 1;
+          }else{i = -1;
+          }if(y>py){j = 1;
+          }else{j = -1;
+          } 
+        }
+        if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+          return_tab.push(`${y+j}${x+i}`);     
+    //Si la case pointée n'est pas vide et contient une pièce de l,adversaire
+      }else if(tab[y][x].piece == piece_ref){
+        //On vérifie si la case suivante est non vide, si c'est la cas, on l'ajoute c'est le cas pour les fous, la dame et la tour
+        if(piece_ref.nom == "fou" || piece_ref.nom == "dame"){  
+          let i =1; let j= 1
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`);
+          i = 1; j = -1;
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`); 
+          i = -1; j = -1;
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`); 
+          i = -1; j = 1;
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`);  
+        }else if(piece_ref.nom == "tour" || piece_ref.nom == "dame"){
+          let i =0; let j= 1
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`);
+          i = 0; j = -1;
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`); 
+          i = -1; j = 0;
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`); 
+          i = 1; j = 0;
+          if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`);
+        }
       }
-    }else{
-    console.log("case inexistante sur le tableau")
-  }
   });
   return return_tab;
 };
@@ -244,18 +316,21 @@ function disPossible(el){
     tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "solid rgba(226, 218, 223, 0.99)";
   });
 }
+//Fonction pour revenir de display_posible_move
 function disPossible_refresh(el){
   el.piece.possible_moves().forEach(move => {
     tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "none";
   });
 }
-
 //Fonction pour vérifier si les 4 variables sont dans les limites
 function checkLimites(x1){
-  if(x1 >= 0 && x1 < 8){
+  if(x1 >= 0 && x1 < 8)
     return 0;
-  }
   return 1;
 }
 
-deplacer(tab[0][4], tab[4][4])
+//Fonction pour ajouter les deplacement du fou 
+
+
+deplacer(tab[0][2], tab[4][6])
+
