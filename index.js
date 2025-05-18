@@ -83,7 +83,35 @@ function Piece(nom, valeur, couleur, x_position, y_position){
           }
 
         return checkCase(possible_tab_temp, this);
-      }
+    case("tour"):
+        possible_tab_temp.push(`${this.y_position}${this.x_position}`);
+        let x_tour = this.x_position + 1;
+        let y_tour = this.y_position;
+        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+          possible_tab_temp.push(`${y_tour}${x_tour}`);
+          x_tour++;
+        }
+        x_tour = this.x_position - 1;
+        y_tour = this.y_position;
+        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+          possible_tab_temp.push(`${y_tour}${x_tour}`);
+          x_tour--;
+        }
+        x_tour = this.x_position
+        y_tour = this.y_position - 1;
+        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+          possible_tab_temp.push(`${y_tour}${x_tour}`);
+          y_tour--;
+        }
+        x_tour = this.x_position ;
+        y_tour = this.y_position + 1;
+        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+          possible_tab_temp.push(`${y_tour}${x_tour}`);
+          y_tour++;
+        }
+
+      return checkCase(possible_tab_temp, this);
+    }
   }
 };
 //Définir le PROTOTYPE d'une cellule de tab
@@ -273,6 +301,12 @@ function checkCase(possiblechecking, piece_ref){
           }if(y>py){j = 1;
           }else{j = -1;
           } 
+        }else if(piece_ref.nom == "tour"){
+          if(x>px){ i = 1; j = 0
+          }else if(x< px){i = -1; j = 0
+          }else if(y>py){j = 1; i=0
+          }else{j = -1; i=0
+          } 
         }
         if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
           return_tab.push(`${y+j}${x+i}`);     
@@ -332,5 +366,5 @@ function checkLimites(x1){
 //Fonction pour ajouter les deplacement du fou 
 
 
-deplacer(tab[0][2], tab[4][6])
+deplacer(tab[0][0], tab[4][6])
 
