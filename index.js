@@ -84,98 +84,118 @@ function Piece(nom, valeur, couleur, x_position, y_position){
           }
 
         return checkCase(possible_tab_temp, this);
-    case("tour"):
+      case("tour"):
+          possible_tab_temp.push(`${this.y_position}${this.x_position}`);
+          let x_tour = this.x_position + 1;
+          let y_tour = this.y_position;
+          while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+            possible_tab_temp.push(`${y_tour}${x_tour}`);
+            x_tour++;
+          }
+          x_tour = this.x_position - 1;
+          y_tour = this.y_position;
+          while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+            possible_tab_temp.push(`${y_tour}${x_tour}`);
+            x_tour--;
+          }
+          x_tour = this.x_position
+          y_tour = this.y_position - 1;
+          while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+            possible_tab_temp.push(`${y_tour}${x_tour}`);
+            y_tour--;
+          }
+          x_tour = this.x_position ;
+          y_tour = this.y_position + 1;
+          while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
+            possible_tab_temp.push(`${y_tour}${x_tour}`);
+            y_tour++;
+          }
+          console.log(possible_tab_temp)
+      
+        return checkCase(possible_tab_temp, this);
+      case("dame"):
+        let possible_tab_temp1 = new Array(0);
+        let possible_tab_temp2 = new Array(0);
+        possible_tab_temp2.push(`${this.y_position}${this.x_position}`);
+        let x_dame_t = this.x_position + 1;
+        let y_dame_t = this.y_position;
+        while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+          possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+          x_dame_t++;
+        }
+        x_dame_t = this.x_position - 1;
+        y_dame_t = this.y_position;
+        while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+          possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+          x_dame_t--;
+        }
+        x_dame_t = this.x_position
+        y_dame_t = this.y_position - 1;
+        while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+          possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+          y_dame_t--;
+        }
+        x_dame_t = this.x_position ;
+        y_dame_t = this.y_position + 1;
+        while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+          possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+          y_dame_t++;
+        }
+
+        //diagonales moves
         possible_tab_temp.push(`${this.y_position}${this.x_position}`);
-        let x_tour = this.x_position + 1;
-        let y_tour = this.y_position;
-        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
-          possible_tab_temp.push(`${y_tour}${x_tour}`);
-          x_tour++;
+        let x_dame_f = this.x_position + 1;
+        let y_dame_f = this.y_position +1;
+        while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+          possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+          x_dame_f++;
+          y_dame_f++;
         }
-        x_tour = this.x_position - 1;
-        y_tour = this.y_position;
-        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
-          possible_tab_temp.push(`${y_tour}${x_tour}`);
-          x_tour--;
+        x_dame_f = this.x_position - 1;
+        y_dame_f = this.y_position - 1;
+        while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+          possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+          x_dame_f--;
+          y_dame_f--;
         }
-        x_tour = this.x_position
-        y_tour = this.y_position - 1;
-        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
-          possible_tab_temp.push(`${y_tour}${x_tour}`);
-          y_tour--;
+        x_dame_f = this.x_position+1;
+        y_dame_f = this.y_position - 1;
+        while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+          possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+          x_dame_f++;
+          y_dame_f--;
         }
-        x_tour = this.x_position ;
-        y_tour = this.y_position + 1;
-        while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
-          possible_tab_temp.push(`${y_tour}${x_tour}`);
-          y_tour++;
+        x_dame_f = this.x_position - 1;
+        y_dame_f = this.y_position + 1;
+        while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+          possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+          x_dame_f--;
+          y_dame_f++;
         }
-        console.log(possible_tab_temp)
-    
-      return checkCase(possible_tab_temp, this);
-    case("dame"):
-      let possible_tab_temp1 = new Array(0);
-      let possible_tab_temp2 = new Array(0);
-      possible_tab_temp2.push(`${this.y_position}${this.x_position}`);
-      let x_dame_t = this.x_position + 1;
-      let y_dame_t = this.y_position;
-      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
-        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
-        x_dame_t++;
-      }
-      x_dame_t = this.x_position - 1;
-      y_dame_t = this.y_position;
-      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
-        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
-        x_dame_t--;
-      }
-      x_dame_t = this.x_position
-      y_dame_t = this.y_position - 1;
-      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
-        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
-        y_dame_t--;
-      }
-      x_dame_t = this.x_position ;
-      y_dame_t = this.y_position + 1;
-      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
-        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
-        y_dame_t++;
-      }
+        let check1 = checkCase(possible_tab_temp1, this)
+        let check2 = checkCase(possible_tab_temp2, this)
 
-      //diagonales moves
-      possible_tab_temp.push(`${this.y_position}${this.x_position}`);
-      let x_dame_f = this.x_position + 1;
-      let y_dame_f = this.y_position +1;
-      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
-        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-        x_dame_f++;
-        y_dame_f++;
-      }
-      x_dame_f = this.x_position - 1;
-      y_dame_f = this.y_position - 1;
-      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
-        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-        x_dame_f--;
-        y_dame_f--;
-      }
-      x_dame_f = this.x_position+1;
-      y_dame_f = this.y_position - 1;
-      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
-        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-        x_dame_f++;
-        y_dame_f--;
-      }
-      x_dame_f = this.x_position - 1;
-      y_dame_f = this.y_position + 1;
-      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
-        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-        x_dame_f--;
-        y_dame_f++;
-      }
-      let check1 = checkCase(possible_tab_temp1, this)
-      let check2 = checkCase(possible_tab_temp2, this)
-
-    return check2.concat(check1);
+        return check2.concat(check1);
+      case("cavalier"):
+        cava_set(this.x_position -2, this.y_position + 1, this, possible_tab_temp);
+        cava_set(this.x_position -2, this.y_position - 1, this, possible_tab_temp);
+        cava_set(this.x_position -1, this.y_position - 2, this, possible_tab_temp);
+        cava_set(this.x_position -1, this.y_position + 2, this, possible_tab_temp);
+        cava_set(this.x_position +2, this.y_position + 1, this, possible_tab_temp);
+        cava_set(this.x_position +2, this.y_position - 1, this, possible_tab_temp);
+        cava_set(this.x_position +1, this.y_position - 2, this, possible_tab_temp);
+        cava_set(this.x_position +1, this.y_position + 2, this, possible_tab_temp);
+        return possible_tab_temp;
+      case("roi"):
+        cava_set(this.x_position + 1, this.y_position + 0, this, possible_tab_temp);
+        cava_set(this.x_position + 1, this.y_position + 1, this, possible_tab_temp);
+        cava_set(this.x_position + 1, this.y_position - 1, this, possible_tab_temp);
+        cava_set(this.x_position - 1, this.y_position + 0, this, possible_tab_temp);
+        cava_set(this.x_position - 1, this.y_position + 1, this, possible_tab_temp);
+        cava_set(this.x_position - 1, this.y_position - 1, this, possible_tab_temp);
+        cava_set(this.x_position, this.y_position + 1, this, possible_tab_temp);
+        cava_set(this.x_position, this.y_position - 1, this, possible_tab_temp);
+        return possible_tab_temp;
     }
   }
 };
@@ -437,8 +457,18 @@ function checkLimites(x1){
   return 1;
 }
 
-//Fonction pour ajouter les deplacement du fou 
+//Fonction pour ajouter les deplacement du cavalier
+function cava_set(cava_x, cava_y, cavalier_el, tableau_concerné){
+  if(checkLimites(cava_x)== 0 && checkLimites(cava_y) == 0){
+    if(tab[cava_y][cava_x].piece.valeur == 0){
+      tableau_concerné.push(`${cava_y}${cava_x}`);
+    }else{
+      if((tab[cava_y][cava_x].piece.joueur != cavalier_el.joueur))
+      tableau_concerné.push(`${cava_y}${cava_x}`);
+    }
+  }
+}
+//Fonction pour les déplacements du roi
 
-
-deplacer(tab[0][3], tab[4][6])
+deplacer(tab[0][6], tab[4][3])
 
