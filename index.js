@@ -28,47 +28,32 @@ function Piece(nom, valeur, couleur, x_position, y_position){
     this.joueur = 0
   };
   //Définir les déplacements possibles
-  this.possible_moves = function (){
-    let possible_tab = new Array(0);
+  this.possible_moves = function(){
+    let possible_tab_temp = new Array(0);
     let facteur_joueur = Math.pow(-1, this.joueur);
     switch(this.nom){
       case("pion"):
-        if(checkCase(this.x_position, this.y_position + facteur_joueur)){
-          possible_tab.push(`${this.y_position + facteur_joueur}${this.x_position}`);
-        }
-        if(this.number_move == 0){
-          if(checkCase(this.x_position, this.y_position + 2*facteur_joueur) == 1)
-            possible_tab.push(`${this.y_position + 2*facteur_joueur}${this.x_position}`)  
+      //Définition du premier coup
+      if(checkLimites(this.y_position + facteur_joueur) == 0 && checkLimites(this.x_position) == 0) {
+        possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position}`);
+      }
+      if(checkLimites(this.y_position + 2 * facteur_joueur) == 0 && checkLimites(this.x_position) == 0 && this.number_move == 0) {
+            possible_tab_temp.push(`${this.y_position + 2 * facteur_joueur}${this.x_position}`);
+      }
+        //Vérification des diagonales
+          if(checkLimites(this.x_position - 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position - 1].piece.valeur != 0) && (tab[this.y_position + facteur_joueur][this.x_position - 1].piece.joueur != this.joueur)) {
+            possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position - 1}`)
           }
-        //Vérifie si les diagonales sont vides
-        let y = this.y_position + facteur_joueur
-        if(y < tab.length && y>0){
-          if(tab[y][this.x_position - 1].piece.valeur != 0 && tab[y][this.x_position - 1].piece.joueur != this.joueur){
-            possible_tab.push(`${y}${this.x_position - 1}`);
+          if(checkLimites(this.x_position + 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position + 1].piece.valeur != 0) && (tab[this.y_position + facteur_joueur][this.x_position + 1].piece.joueur != this.joueur)){
+            possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position + 1}`) 
           }
-          if(tab[y][this.x_position + 1].piece.valeur != 0 && tab[y][this.x_position - 1].piece.joueur != this.joueur){
-            possible_tab.push(`${y}${this.x_position + 1}`);
-          }
-        }
-        //Le coup en passant
-        break;
-      case("fou"):
-      console.log("c'est un fou")
-        let i = this.x_position + 1; j=this.y_position + 1;
-        while (i<8 && j<8 && checkCase(i, j)) {
-          possible_tab.push(`${j}${i}`)
-          i++; j++;
-        }
-        var i2 = this.x_position - 1; j2 = this.y_position + 1;
-        while (i2>=0 && j2>=0 && checkCase(i2, j2) ) {
-          possible_tab.push(`${j2}${i2}`)
-          i2--; j2--;
-        }
         
-      
-      break;
-    }
-    return possible_tab;
+        //Vérifier les cases 
+        var tableau_final = checkCase(possible_tab_temp, this);
+        //LE COUP EN PASSANT
+
+        return tableau_final;
+      }
   }
 };
 //Définir le PROTOTYPE d'une cellule de tab
@@ -230,18 +215,29 @@ const find_el = (tableau, searched) => {
       return 1
   }
   return -1
-}
+};
 //Fonction pour retrouver si une case est vide 
-const checkCase = (x, y) => {
-  console.log("check case")
-  console.log(tab[y][x].html_cel)
-  if(tab[y][x].piece.valeur == 0){
-    console.log("vide")
-    return 1
+function checkCase(possiblechecking, piece_ref){
+  let return_tab = new Array(0);
+  possiblechecking.forEach(cases => {
+    let y = parseInt(cases[0]);
+    let x = parseInt(cases[1])
+    if((checkLimites(x) == 0) && (checkLimites(y) == 0)){
+      //si c'est un pion, on check les diagonales
+      if(piece_ref.nom =="pion" && x != piece_ref.x_position && tab[y][x].piece.valeur != 0 && tab[y][x].piece.joueur != piece_ref.joueur ){
+        return_tab.push(`${y}${x}`)
+      }
+
+      //on teste si la case pointée est vide 
+      if(!tab[y][x].piece.valeur){
+        return_tab.push(`${y}${x}`)
+      }
+    }else{
+    console.log("case inexistante sur le tableau")
   }
-  console.log("occupée")
-  return 0;
-}
+  });
+  return return_tab;
+};
 //Function display_possible moves
 function disPossible(el){
   el.piece.possible_moves().forEach(move => {
@@ -253,5 +249,13 @@ function disPossible_refresh(el){
     tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "none";
   });
 }
-deplacer(tab[0][2], tab[4][2])
-  console.log(tab[1][3].piece.valeur);
+
+//Fonction pour vérifier si les 4 variables sont dans les limites
+function checkLimites(x1){
+  if(x1 >= 0 && x1 < 8){
+    return 0;
+  }
+  return 1;
+}
+
+deplacer(tab[0][4], tab[4][4])
