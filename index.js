@@ -9,7 +9,8 @@ for(let i=0; i<tab.length; i++){
 }
 //Variables du jeu
 var data_play = {
-  number_active: 0
+  number_active: 0,
+  player : 1
 };
 //Définir prototype de pièce
 function Piece(nom, valeur, couleur, x_position, y_position){
@@ -290,7 +291,7 @@ refresh();
 //Fonction evennement cliquer
 function cliquer(el){
   display_piece(el);
-  if(data_play.number_active == 0 && el.piece.valeur != 0 ){
+  if(data_play.number_active == 0 && el.piece.valeur != 0  && el.piece.joueur == data_play.player){
     //Aficher les deplacements possibles de la piece sur laquelle on clique
     disPossible(el)
     el.html_cel.style.background = "rgba(224, 185, 8, 0.85)";
@@ -303,6 +304,8 @@ function cliquer(el){
     let des = el;
     if(src != des && find_el(src.piece.possible_moves(), des.html_cel.id) == 1){
       deplacer(src, des);
+      //change le joueur autorisé
+      change_player();
     }
     src.html_cel.style.background = src.html_cel.defaut_color;
     data_play.number_active = 0;
@@ -470,5 +473,13 @@ function cava_set(cava_x, cava_y, cavalier_el, tableau_concerné){
 }
 //Fonction pour les déplacements du roi
 
+//Fonction pour changer de joueur
+function change_player(){
+  if(data_play.player == 1){
+    data_play.player = 2
+  }else{
+    data_play.player = 1
+  }
+}
 deplacer(tab[0][6], tab[4][3])
 
