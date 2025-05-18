@@ -1,6 +1,7 @@
 var plateau = document.getElementById("plateau");
 var table = document.createElement("table")
 plateau.appendChild(table); 
+var dame_index = 0;
 //Definition du tableau 8x8 en js
 var tab = new Array(8);
 for(let i=0; i<tab.length; i++){
@@ -109,8 +110,72 @@ function Piece(nom, valeur, couleur, x_position, y_position){
           possible_tab_temp.push(`${y_tour}${x_tour}`);
           y_tour++;
         }
-
+        console.log(possible_tab_temp)
+    
       return checkCase(possible_tab_temp, this);
+    case("dame"):
+      let possible_tab_temp1 = new Array(0);
+      let possible_tab_temp2 = new Array(0);
+      possible_tab_temp2.push(`${this.y_position}${this.x_position}`);
+      let x_dame_t = this.x_position + 1;
+      let y_dame_t = this.y_position;
+      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+        x_dame_t++;
+      }
+      x_dame_t = this.x_position - 1;
+      y_dame_t = this.y_position;
+      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+        x_dame_t--;
+      }
+      x_dame_t = this.x_position
+      y_dame_t = this.y_position - 1;
+      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+        y_dame_t--;
+      }
+      x_dame_t = this.x_position ;
+      y_dame_t = this.y_position + 1;
+      while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
+        possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
+        y_dame_t++;
+      }
+
+      //diagonales moves
+      possible_tab_temp.push(`${this.y_position}${this.x_position}`);
+      let x_dame_f = this.x_position + 1;
+      let y_dame_f = this.y_position +1;
+      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+        x_dame_f++;
+        y_dame_f++;
+      }
+      x_dame_f = this.x_position - 1;
+      y_dame_f = this.y_position - 1;
+      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+        x_dame_f--;
+        y_dame_f--;
+      }
+      x_dame_f = this.x_position+1;
+      y_dame_f = this.y_position - 1;
+      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+        x_dame_f++;
+        y_dame_f--;
+      }
+      x_dame_f = this.x_position - 1;
+      y_dame_f = this.y_position + 1;
+      while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
+        possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
+        x_dame_f--;
+        y_dame_f++;
+      }
+      let check1 = checkCase(possible_tab_temp1, this)
+      let check2 = checkCase(possible_tab_temp2, this)
+
+    return check2.concat(check1);
     }
   }
 };
@@ -167,7 +232,7 @@ for(let i=0; i<tab.length; i++){
 //Tours blanches et noires 
 tab[0][0].piece = new Piece("tour", 4, "noir", 0, 0);
 tab[0][7].piece = new Piece("tour", 4, "noir", 7, 0);
-tab[7][0].piece = new Piece("tour", 4, "blanc", 1, 0);
+tab[7][0].piece = new Piece("tour", 4, "blanc", 0, 7);
 tab[7][7].piece = new Piece("tour", 4, "blanc", 7, 7);
 //Cavalier
 tab[0][1].piece = new Piece("cavalier", 3, "noir", 1, 0);
@@ -295,29 +360,37 @@ function checkCase(possiblechecking, piece_ref){
         return_tab.push(`${y}${x}`)
         //si la case suivante pointée n'est pas vide
         //On vérifie si la case suivante est non vide, si c'est la cas, on l'ajoute c'est le cas pour les fous, la dame et la tour
-        if(piece_ref.nom == "fou"){
-          if(x>px){ i = 1;
-          }else{i = -1;
-          }if(y>py){j = 1;
-          }else{j = -1;
-          } 
-        }else if(piece_ref.nom == "tour"){
+        if(piece_ref.nom == "fou" || piece_ref.nom == "dame"){
+          
+            if(x>px){ i = 1;
+            }else{i = -1;
+            }if(y>py){j = 1;
+            }else{j = -1;
+            }
+            if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+              return_tab.push(`${y+j}${x+i}`); 
+          
+          dame_index = 0;
+      }
+        if(piece_ref.nom == "tour" || piece_ref.nom == "dame"){
+          dame_index = 0 
           if(x>px){ i = 1; j = 0
           }else if(x< px){i = -1; j = 0
-          }else if(y>py){j = 1; i=0
+          }else if(y>py){j = 1; i=0 
           }else{j = -1; i=0
           } 
+          if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
+            return_tab.push(`${y+j}${x+i}`);
         }
         if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
           return_tab.push(`${y+j}${x+i}`);     
     //Si la case pointée n'est pas vide et contient une pièce de l,adversaire
       }else if(tab[y][x].piece == piece_ref){
-        //On vérifie si la case suivante est non vide, si c'est la cas, on l'ajoute c'est le cas pour les fous, la dame et la tour
         if(piece_ref.nom == "fou" || piece_ref.nom == "dame"){  
           let i =1; let j= 1
           if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
             return_tab.push(`${y+j}${x+i}`);
-          i = 1; j = -1;
+          i = 1; j = -1; 
           if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
             return_tab.push(`${y+j}${x+i}`); 
           i = -1; j = -1;
@@ -326,7 +399,8 @@ function checkCase(possiblechecking, piece_ref){
           i = -1; j = 1;
           if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
             return_tab.push(`${y+j}${x+i}`);  
-        }else if(piece_ref.nom == "tour" || piece_ref.nom == "dame"){
+        };
+        if(piece_ref.nom == "tour" || piece_ref.nom == "dame"){
           let i =0; let j= 1
           if(checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
             return_tab.push(`${y+j}${x+i}`);
@@ -366,5 +440,5 @@ function checkLimites(x1){
 //Fonction pour ajouter les deplacement du fou 
 
 
-deplacer(tab[0][0], tab[4][6])
+deplacer(tab[0][3], tab[4][6])
 
