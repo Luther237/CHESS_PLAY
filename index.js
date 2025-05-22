@@ -481,5 +481,4 @@ function change_player(){
     data_play.player = 1
   }
 }
-deplacer(tab[0][6], tab[4][3])
 
