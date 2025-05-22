@@ -50,7 +50,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
               possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position + 1}`) 
             }
           //LE COUP EN PASSANT
-        return checkCase(possible_tab_temp, this);
+        return [...new Set(checkCase(possible_tab_temp, this))];
 
       case("fou"):
           let i = 0;
@@ -84,7 +84,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
             y_fou--;
           }
 
-        return checkCase(possible_tab_temp, this);
+        return [...new Set(checkCase(possible_tab_temp, this))];
       case("tour"):
           possible_tab_temp.push(`${this.y_position}${this.x_position}`);
           let x_tour = this.x_position + 1;
@@ -113,7 +113,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
           }
           console.log(possible_tab_temp)
       
-        return checkCase(possible_tab_temp, this);
+        return [...new Set(checkCase(possible_tab_temp, this))];
       case("dame"):
         let possible_tab_temp1 = new Array(0);
         let possible_tab_temp2 = new Array(0);
@@ -142,9 +142,8 @@ function Piece(nom, valeur, couleur, x_position, y_position){
           possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
           y_dame_t++;
         }
-
         //diagonales moves
-        possible_tab_temp.push(`${this.y_position}${this.x_position}`);
+        possible_tab_temp2.push(`${this.y_position}${this.x_position}`);
         let x_dame_f = this.x_position + 1;
         let y_dame_f = this.y_position +1;
         while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
@@ -173,10 +172,9 @@ function Piece(nom, valeur, couleur, x_position, y_position){
           x_dame_f--;
           y_dame_f++;
         }
-        let check1 = checkCase(possible_tab_temp1, this)
-        let check2 = checkCase(possible_tab_temp2, this)
-
-        return check2.concat(check1);
+        let check1 = checkCase(possible_tab_temp1, this, "transversale")
+        let check2 = checkCase(possible_tab_temp2, this, "diagonale")
+        return [...new Set(check1.concat(check2))];
       case("cavalier"):
         cava_set(this.x_position -2, this.y_position + 1, this, possible_tab_temp);
         cava_set(this.x_position -2, this.y_position - 1, this, possible_tab_temp);
@@ -186,7 +184,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
         cava_set(this.x_position +2, this.y_position - 1, this, possible_tab_temp);
         cava_set(this.x_position +1, this.y_position - 2, this, possible_tab_temp);
         cava_set(this.x_position +1, this.y_position + 2, this, possible_tab_temp);
-        return possible_tab_temp;
+        return [...new Set(possible_tab_temp)];
       case("roi"):
         cava_set(this.x_position + 1, this.y_position + 0, this, possible_tab_temp);
         cava_set(this.x_position + 1, this.y_position + 1, this, possible_tab_temp);
@@ -196,7 +194,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
         cava_set(this.x_position - 1, this.y_position - 1, this, possible_tab_temp);
         cava_set(this.x_position, this.y_position + 1, this, possible_tab_temp);
         cava_set(this.x_position, this.y_position - 1, this, possible_tab_temp);
-        return possible_tab_temp;
+        return [...new Set(possible_tab_temp)];
     }
   }
 };
@@ -363,7 +361,7 @@ const find_el = (tableau, searched) => {
   return -1
 };
 //Fonction pour retrouver si une case est vide 
-function checkCase(possiblechecking, piece_ref){
+function checkCase(possiblechecking, piece_ref, type_move){
   let return_tab = new Array(0);
   //je fais le check des cases voisinnes
   
@@ -383,7 +381,7 @@ function checkCase(possiblechecking, piece_ref){
         return_tab.push(`${y}${x}`)
         //si la case suivante pointée n'est pas vide
         //On vérifie si la case suivante est non vide, si c'est la cas, on l'ajoute c'est le cas pour les fous, la dame et la tour
-        if(piece_ref.nom == "fou" || piece_ref.nom == "dame"){
+        if(piece_ref.nom == "fou" || type_move == "diagonale"){
           
             if(x>px){ i = 1;
             }else{i = -1;
@@ -395,7 +393,7 @@ function checkCase(possiblechecking, piece_ref){
           
           dame_index = 0;
       }
-        if(piece_ref.nom == "tour" || piece_ref.nom == "dame"){
+        if(piece_ref.nom == "tour" || type_move == "transversale"){
           dame_index = 0 
           if(x>px){ i = 1; j = 0
           }else if(x< px){i = -1; j = 0
@@ -407,7 +405,7 @@ function checkCase(possiblechecking, piece_ref){
         }
         if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
           return_tab.push(`${y+j}${x+i}`);     
-    //Si la case pointée n'est pas vide et contient une pièce de l,adversaire
+    //Si la case pointée n'est pas vide et contient une pièce de l'adversaire
       }else if(tab[y][x].piece == piece_ref){
         if(piece_ref.nom == "fou" || piece_ref.nom == "dame"){  
           let i =1; let j= 1
@@ -481,4 +479,6 @@ function change_player(){
     data_play.player = 1
   }
 }
+//Fonction pour supprimer les doublons dans un tableau
 
+//Deplacement manuel des pieces
