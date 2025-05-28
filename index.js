@@ -39,7 +39,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
         if(checkLimites(this.y_position + facteur_joueur) == 0 && checkLimites(this.x_position) == 0) {
           possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position}`);
         }
-        if(checkLimites(this.y_position + 2 * facteur_joueur) == 0 && checkLimites(this.x_position) == 0 && this.number_move == 0) {
+        if(checkLimites(this.y_position + 2 * facteur_joueur) == 0 && tab[y_position + facteur_joueur][x_position].piece.valeur == 0 && checkLimites(this.x_position) == 0 && this.number_move == 0) {
               possible_tab_temp.push(`${this.y_position + 2 * facteur_joueur}${this.x_position}`);
         }
           //Vérification des diagonales
@@ -303,7 +303,7 @@ function cliquer(el){
     if(src != des && find_el(src.piece.possible_moves(), des.html_cel.id) == 1){
       deplacer(src, des);
       //change le joueur autorisé
-      change_player();
+      data_play.player = data_play.player == 1?2:1;
     }
     src.html_cel.style.background = src.html_cel.defaut_color;
     data_play.number_active = 0;
@@ -460,6 +460,7 @@ function checkLimites(x1){
 
 //Fonction pour ajouter les deplacement du cavalier
 function cava_set(cava_x, cava_y, cavalier_el, tableau_concerné){
+
   if(checkLimites(cava_x)== 0 && checkLimites(cava_y) == 0){
     if(tab[cava_y][cava_x].piece.valeur == 0){
       tableau_concerné.push(`${cava_y}${cava_x}`);
@@ -471,14 +472,6 @@ function cava_set(cava_x, cava_y, cavalier_el, tableau_concerné){
 }
 //Fonction pour les déplacements du roi
 
-//Fonction pour changer de joueur
-function change_player(){
-  if(data_play.player == 1){
-    data_play.player = 2
-  }else{
-    data_play.player = 1
-  }
-}
 //Fonction pour supprimer les doublons dans un tableau
 
 //Deplacement manuel des pieces
