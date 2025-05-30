@@ -22,13 +22,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
   this.y_position = y_position;
   this.number_move = 0;
   //Définir le joueur possedant la piece
-  if(couleur == "noir"){
-    this.joueur = 2
-  }else if(couleur == "blanc"){
-    this.joueur = 1
-  }else{
-    this.joueur = 0
-  };
+  this.joueur = couleur=="noir"?2:couleur=="blanc"?1:0;
   //Définir les déplacements possibles
   this.possible_moves = function(){
     let possible_tab_temp = new Array(0);
@@ -285,7 +279,6 @@ var refresh = (
 refresh();
 //L'ENVIRONNEMENT DU JEU A FINIT D'ETRE CODÉ
 //JE PASSE AU DEPLACEMENT
-
 //Fonction evennement cliquer
 function cliquer(el){
   display_piece(el);
