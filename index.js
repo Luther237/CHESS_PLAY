@@ -1,3 +1,5 @@
+const { data_play } = require("./data_play");
+
 var plateau = document.getElementById("plateau");
 var table = document.createElement("table")
 plateau.appendChild(table); 
@@ -7,15 +9,6 @@ var tab = new Array(8);
 for(let i=0; i<tab.length; i++){
   tab[i] = new Array(8);
 }
-//Variables du jeu
-var data_play = {
-  number_active: 0,
-  player : 1,
-  moves_jeu: () => {
-    let move_tab = new Array(0);
-    return move_tab;
-  }
-};
 //Définir prototype de pièce
 function Piece(nom, valeur, couleur, x_position, y_position){
   this.nom = nom; 
