@@ -1,5 +1,3 @@
-const { data_play } = require("./data_play");
-
 var plateau = document.getElementById("plateau");
 var table = document.createElement("table")
 plateau.appendChild(table); 
@@ -9,6 +7,26 @@ var tab = new Array(8);
 for(let i=0; i<tab.length; i++){
   tab[i] = new Array(8);
 }
+//Variables du jeu
+var data_play = {
+  number_active: 0,
+  player: 1,
+  moves_jeu_auth: [],
+  get moves_jeu(){
+    let move_tab = new Array(0);
+    for(let i = 0; i<tab.length; i++){
+      let j =0;
+        while(j < tab.length && tab[i][j].piece.valeur != 0){
+            move_tab.push([tab[i][j].piece.nom, `${i}${j}`,tab[i][j].piece.possible_moves()]);
+            j++;
+        }
+    }
+    return move_tab;
+  },
+  set moves_jeu_auth(data){
+    this.moves_jeu_auth = [...data];
+  }
+};
 //Définir prototype de pièce
 function Piece(nom, valeur, couleur, x_position, y_position){
   this.nom = nom; 
@@ -46,126 +64,101 @@ function Piece(nom, valeur, couleur, x_position, y_position){
       case("fou"):
           let i = 0;
           possible_tab_temp.push(`${this.y_position}${this.x_position}`);
-          let x_fou = this.x_position + 1;
-          let y_fou = this.y_position + 1;
+          let x_fou = this.x_position + 1;  let y_fou = this.y_position + 1;
           while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
             possible_tab_temp.push(`${y_fou}${x_fou}`);
-            x_fou++;
-            y_fou++;
+            x_fou++;  y_fou++;
           }
-          y_fou = this.y_position + 1;
-          x_fou = this.x_position - 1;
+          y_fou = this.y_position + 1;  x_fou = this.x_position - 1;
           while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
             possible_tab_temp.push(`${y_fou}${x_fou}`);
-            x_fou--;
-            y_fou++;
+            x_fou--;  y_fou++;
           }
-          x_fou = this.x_position - 1
-          y_fou = this.y_position - 1;
+          x_fou = this.x_position - 1;  y_fou = this.y_position - 1;
           while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
             possible_tab_temp.push(`${y_fou}${x_fou}`);
-            x_fou--;
-            y_fou--;
+            x_fou--;  y_fou--;
           }
-          y_fou = this.y_position - 1;
-          x_fou = this.x_position + 1;
+          y_fou = this.y_position - 1;  x_fou = this.x_position + 1;
           while(checkLimites(x_fou) == 0 && checkLimites(y_fou) == 0 && tab[y_fou][x_fou].piece.valeur == 0){
             possible_tab_temp.push(`${y_fou}${x_fou}`);
-            x_fou++;
-            y_fou--;
+            x_fou++;  y_fou--;
           }
 
-        return [...new Set(checkCase(possible_tab_temp, this))];
+      return [...new Set(checkCase(possible_tab_temp, this))];
+
       case("tour"):
           possible_tab_temp.push(`${this.y_position}${this.x_position}`);
-          let x_tour = this.x_position + 1;
-          let y_tour = this.y_position;
+          let x_tour = this.x_position + 1; let y_tour = this.y_position;
           while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
-            possible_tab_temp.push(`${y_tour}${x_tour}`);
-            x_tour++;
+            possible_tab_temp.push(`${y_tour}${x_tour}`); x_tour++;
           }
-          x_tour = this.x_position - 1;
-          y_tour = this.y_position;
+          x_tour = this.x_position - 1; y_tour = this.y_position;
           while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
-            possible_tab_temp.push(`${y_tour}${x_tour}`);
+            possible_tab_temp.push(`${y_tour}${x_tour}`); 
             x_tour--;
           }
-          x_tour = this.x_position
-          y_tour = this.y_position - 1;
+          x_tour = this.x_position;  y_tour = this.y_position - 1;
           while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
-            possible_tab_temp.push(`${y_tour}${x_tour}`);
+            possible_tab_temp.push(`${y_tour}${x_tour}`); 
             y_tour--;
           }
-          x_tour = this.x_position ;
-          y_tour = this.y_position + 1;
+          x_tour = this.x_position ;  y_tour = this.y_position + 1;
           while(checkLimites(x_tour) == 0 && checkLimites(y_tour) == 0 && tab[y_tour][x_tour].piece.valeur == 0){
             possible_tab_temp.push(`${y_tour}${x_tour}`);
             y_tour++;
           }
-          console.log(possible_tab_temp)
-      
-        return [...new Set(checkCase(possible_tab_temp, this))];
+      return [...new Set(checkCase(possible_tab_temp, this))];
+
       case("dame"):
-        let possible_tab_temp1 = new Array(0);
-        let possible_tab_temp2 = new Array(0);
+        let possible_tab_temp1 = new Array(0);  let possible_tab_temp2 = new Array(0);
         possible_tab_temp2.push(`${this.y_position}${this.x_position}`);
-        let x_dame_t = this.x_position + 1;
-        let y_dame_t = this.y_position;
+        let x_dame_t = this.x_position + 1; let y_dame_t = this.y_position;
         while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
           possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
           x_dame_t++;
         }
-        x_dame_t = this.x_position - 1;
-        y_dame_t = this.y_position;
+        x_dame_t = this.x_position - 1; y_dame_t = this.y_position;
         while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
           possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
           x_dame_t--;
         }
-        x_dame_t = this.x_position
-        y_dame_t = this.y_position - 1;
+        x_dame_t = this.x_position; y_dame_t = this.y_position - 1;
         while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
           possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
           y_dame_t--;
         }
-        x_dame_t = this.x_position ;
-        y_dame_t = this.y_position + 1;
+        x_dame_t = this.x_position;  y_dame_t = this.y_position + 1;
         while(checkLimites(x_dame_t) == 0 && checkLimites(y_dame_t) == 0 && tab[y_dame_t][x_dame_t].piece.valeur == 0){
           possible_tab_temp1.push(`${y_dame_t}${x_dame_t}`);
           y_dame_t++;
         }
         //diagonales moves
         possible_tab_temp2.push(`${this.y_position}${this.x_position}`);
-        let x_dame_f = this.x_position + 1;
-        let y_dame_f = this.y_position +1;
+        let x_dame_f = this.x_position + 1; let y_dame_f = this.y_position +1;
         while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
           possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-          x_dame_f++;
-          y_dame_f++;
+          x_dame_f++; y_dame_f++;
         }
-        x_dame_f = this.x_position - 1;
-        y_dame_f = this.y_position - 1;
+        x_dame_f = this.x_position - 1; y_dame_f = this.y_position - 1;
         while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
           possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-          x_dame_f--;
-          y_dame_f--;
+          x_dame_f--; y_dame_f--;
         }
-        x_dame_f = this.x_position+1;
-        y_dame_f = this.y_position - 1;
+        x_dame_f = this.x_position+1; y_dame_f = this.y_position - 1;
         while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
           possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-          x_dame_f++;
-          y_dame_f--;
+          x_dame_f++; y_dame_f--;
         }
-        x_dame_f = this.x_position - 1;
-        y_dame_f = this.y_position + 1;
+        x_dame_f = this.x_position - 1; y_dame_f = this.y_position + 1;
         while(checkLimites(x_dame_f) == 0 && checkLimites(y_dame_f) == 0 && tab[y_dame_f][x_dame_f].piece.valeur == 0){
           possible_tab_temp2.push(`${y_dame_f}${x_dame_f}`);
-          x_dame_f--;
-          y_dame_f++;
+          x_dame_f--; y_dame_f++;
         }
         let check1 = checkCase(possible_tab_temp1, this, "transversale")
         let check2 = checkCase(possible_tab_temp2, this, "diagonale")
-        return [...new Set(check1.concat(check2))];
+      return [...new Set(check1.concat(check2))];
+      
       case("cavalier"):
         cava_set(this.x_position -2, this.y_position + 1, this, possible_tab_temp);
         cava_set(this.x_position -2, this.y_position - 1, this, possible_tab_temp);
@@ -175,7 +168,8 @@ function Piece(nom, valeur, couleur, x_position, y_position){
         cava_set(this.x_position +2, this.y_position - 1, this, possible_tab_temp);
         cava_set(this.x_position +1, this.y_position - 2, this, possible_tab_temp);
         cava_set(this.x_position +1, this.y_position + 2, this, possible_tab_temp);
-        return [...new Set(possible_tab_temp)];
+      return [...new Set(possible_tab_temp)];
+      
       case("roi"):
         cava_set(this.x_position + 1, this.y_position + 0, this, possible_tab_temp);
         cava_set(this.x_position + 1, this.y_position + 1, this, possible_tab_temp);
@@ -185,15 +179,10 @@ function Piece(nom, valeur, couleur, x_position, y_position){
         cava_set(this.x_position - 1, this.y_position - 1, this, possible_tab_temp);
         cava_set(this.x_position, this.y_position + 1, this, possible_tab_temp);
         cava_set(this.x_position, this.y_position - 1, this, possible_tab_temp);
-        return [...new Set(possible_tab_temp)];
+      return [...new Set(possible_tab_temp)];
     }
   }
 };
-//Définir le PROTOTYPE d'une cellule de tab
-function Tab_cel(cellule, piece){
-  this.html_cel = cellule;
-  this.piece = piece;
-}
 //REMPLISSAGE  DU TABLEAU
 for(let i=0; i<tab.length; i++){
   //Parcours des lignes
@@ -217,19 +206,12 @@ for(let i=0; i<tab.length; i++){
     }else{
       tab[i][j].html_cel.style.background = "rgba(111, 0, 155, 0.85)";
       tab[i][j].html_cel.defaut_color = "rgba(111, 0, 155, 0.85)";
-     }
+    }
    
-    //Valeurs initiales
      //Pions noirs et blancs
-     if(i == 1){
-      tab[i][j].piece = new Piece("pion", 1, "noir", j, i);
-     }else if(i == 6){
-      tab[i][j].piece = new Piece("pion", 1, "blanc", j, i);
-     }else if(i<7 && i>1){
-      tab[i][j].piece = new Piece("undefine", 0, "", j, i);
-      var empty_piece = new Piece("undefine", 0, "", 100, 100);
-    
-     }
+     
+    var empty_piece = new Piece("undefine", 0, "", 100, 100);
+    tab[i][j].piece = i==1?new Piece("pion", 1, "noir", j, i):i==6?new Piece("pion", 1, "blanc", j, i):new Piece("undefine", 0, "", j, i);
     
     //Définition des fonctions
     tab[i][j].html_cel.addEventListener("click",() => cliquer(tab[i][j]));
@@ -237,6 +219,12 @@ for(let i=0; i<tab.length; i++){
     tab[i][j].html_cel.image = document.createElement("img");
     tab[i][j].html_cel.appendChild(tab[i][j].html_cel.image)
   } 
+}
+
+//Définir le PROTOTYPE d'une cellule de tab
+function Tab_cel(cellule, piece){
+  this.html_cel = cellule;
+  this.piece = piece;
 }
 //Valeurs initiales
 //Tours blanches et noires 
@@ -281,21 +269,40 @@ function cliquer(el){
   display_piece(el);
   if(data_play.number_active == 0 && el.piece.valeur != 0  && el.piece.joueur == data_play.player){
     //Aficher les deplacements possibles de la piece sur laquelle on clique
-    disPossible(el)
+    el.piece.possible_moves().forEach(move => {
+      tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "solid rgba(226, 218, 223, 0.99)";
+    });
+    //CHANGE LE FOND de la pièce
     el.html_cel.style.background = "rgba(224, 185, 8, 0.85)";
+    //mET A JOUR LES DONNEES DU JEU
     data_play.first_active = el;
     data_play.number_active = 1;
+    highlightEchecRois();
   }else if(data_play.number_active == 1){
     //remmetre tout à son état initial
     disPossible_refresh(data_play.first_active)
     let src = data_play.first_active;
     let des = el;
     if(src != des && find_el(src.piece.possible_moves(), des.html_cel.id) == 1){
-      deplacer(src, des);
+      deplacer(src, des);   
+      //Vérifier si le roi est en échec
+      if(isEchec(data_play.player) == true){
+        //Si le roi est en échec, on remet la piece à sa place initiale
+        deplacer(des, src);
+        disPossible_refresh(src);
+        let roiPos = findRoi(data_play.player); 
+        tab[roiPos.y][roiPos.x].html_cel.style.background = "rgba(255, 0, 0, 0.5)";
+        data_play.player = data_play.player == 1?2:1;
+        alert("Le roi est en échec, vous ne pouvez pas faire ce coup");
+        highlightEchecRois();
+      }
       //change le joueur autorisé
+      highlightEchecRois() 
       data_play.player = data_play.player == 1?2:1;
     }
     src.html_cel.style.background = src.html_cel.defaut_color;
+    highlightEchecRois();
+    checkMatOuPat(el.piece.joueur==1?2:1);
     data_play.number_active = 0;
   }
 }
@@ -312,7 +319,8 @@ function deplacer(x,y){
       [x.piece.x_position, x.piece.y_position] = [parseInt(x.html_cel.id[1]), parseInt(x.html_cel.id[0])];
       [y.piece.x_position, y.piece.y_position] = [parseInt(y.html_cel.id[1]), parseInt(y.html_cel.id[0])];
     }else{
-      capture(x, y)
+      capture(x, y);
+      highlightEchecRois() 
     }
   }else{
     console.log("Déplacement impossible");
@@ -429,12 +437,6 @@ function checkCase(possiblechecking, piece_ref, type_move){
   });
   return return_tab;
 };
-//Function display_possible moves
-function disPossible(el){
-  el.piece.possible_moves().forEach(move => {
-    tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "solid rgba(226, 218, 223, 0.99)";
-  });
-}
 //Fonction pour revenir de display_posible_move
 function disPossible_refresh(el){
   el.piece.possible_moves().forEach(move => {
@@ -460,8 +462,112 @@ function cava_set(cava_x, cava_y, cavalier_el, tableau_concerné){
     }
   }
 }
-//Fonction pour les déplacements du roi
 
-//Fonction pour supprimer les doublons dans un tableau
+//Je cherche la positin du roi
+function findRoi(joueur) {
+  for (let i = 0; i < tab.length; i++) {
+    for (let j = 0; j < tab.length; j++) {
+      if (tab[i][j].piece.nom === "roi" && tab[i][j].piece.joueur === joueur) {
+        return { x: j, y: i };
+      }
+    }
+  }
+  return null;
+}
+//Fonction pour recalculer les déplacements de toutes les pièces
+function fresh_possible_moves(){
+  for (let i = 0; i < tab.length; i++) {
+    for (let j = 0; j < tab.length; j++) {
+      if (tab[i][j].piece.valeur != 0) {
+        tab[i][j].piece.possible_moves();
+      }
+    }
+  }
+}
+//Fonction pour vérifier si le roi est en échec
+function isEchec(joueur) {
+  const roiPos = findRoi(joueur);
+  if (!roiPos) return false;
+  for (let i = 0; i < tab.length; i++) {
+    for (let j = 0; j < tab.length; j++) {
+      const piece = tab[i][j].piece;
+      if (piece.valeur != 0) {
+        const moves = piece.possible_moves();
+        if (moves.includes(`${roiPos.y}${roiPos.x}`)) {
+          return true;
+        }
+      }
+    }
+  }
+  tab[roiPos.y][roiPos.x].html_cel.style.background = tab[roiPos.y][roiPos.x].html_cel.defaut_color;
+  return false;
+}
+function highlightEchecRois() {
+  [1, 2].forEach(joueur => {
+    const roiPos = findRoi(joueur);
+    if (!roiPos) return;
+    let enEchec = false;
+    for (let i = 0; i < tab.length; i++) {
+      for (let j = 0; j < tab.length; j++) {
+        const piece = tab[i][j].piece;
+        if (piece.valeur != 0 && piece.joueur != joueur) {
+          const moves = piece.possible_moves();
+          if (moves.includes(`${roiPos.y}${roiPos.x}`)) {
+            enEchec = true;
+            break;
+          }
+        }
+      }
+      if (enEchec) break;
+    }
+    if (enEchec) {
+      tab[roiPos.y][roiPos.x].html_cel.style.background = "rgba(255, 0, 0, 0.5)";
+    } else {
+      tab[roiPos.y][roiPos.x].html_cel.style.background = tab[roiPos.y][roiPos.x].html_cel.defaut_color;
+    }
+  });
+}
+//Je vérifie si il exixte des coups légaux
+function joueurACoupLegal(joueur) {
+  for (let i = 0; i < tab.length; i++) {
+    for (let j = 0; j < tab.length; j++) {
+      const piece = tab[i][j].piece;
+      if (piece.valeur != 0 && piece.joueur == joueur) {
+        const moves = piece.possible_moves();
+        for (let move of moves) {
+          // Simule le coup
+          const y = parseInt(move[0]);
+          const x = parseInt(move[1]);
+          const src = tab[i][j];
+          const des = tab[y][x];
+          // Sauvegarde l'état
+          const tempSrc = {...src.piece};
+          const tempDes = {...des.piece};
+          deplacer(src, des);
+          const echec = isEchec(joueur);
+          // Annule le coup
+          Object.assign(src.piece, tempSrc);
+          Object.assign(des.piece, tempDes);
+          src.html_cel.image.src = src.piece.image_src;
+          if (!echec) return true; 
+          // Il existe un coup légal
+          des.html_cel.image.src = des.piece.image_src;
+        }
+      }
+    }
+  }
+  return false; // Aucun coup légal
+}
 
-//Deplacement manuel des pieces
+function checkMatOuPat(joueur) {
+  if (isEchec(joueur)) {
+    if (!joueurACoupLegal(joueur)) {
+      alert("Échec et mat ! Joueur " + (joueur==1?"blanc":"noir") + " a perdu.");
+      // Ici tu peux bloquer la partie ou proposer de recommencer
+    }
+  } else {
+    if (!joueurACoupLegal(joueur)) {
+      alert("Pat ! Match nul.");
+    }
+  }
+}
