@@ -301,9 +301,9 @@ function cliquer(el){
       data_play.player = data_play.player == 1?2:1;
     }
     src.html_cel.style.background = src.html_cel.defaut_color;
-    highlightEchecRois();
     checkMatOuPat(el.piece.joueur==1?2:1);
     data_play.number_active = 0;
+    highlightEchecRois();
   }
 }
 //Fonction pour PERMUTTER deux OBJETS
@@ -541,17 +541,16 @@ function joueurACoupLegal(joueur) {
           const src = tab[i][j];
           const des = tab[y][x];
           // Sauvegarde l'état
-          const tempSrc = {...src.piece};
-          const tempDes = {...des.piece};
+          const tempSrc = Object.assign({}, src.piece);
+          const tempDes = Object.assign({}, des.piece);
           deplacer(src, des);
           const echec = isEchec(joueur);
           // Annule le coup
-          Object.assign(src.piece, tempSrc);
-          Object.assign(des.piece, tempDes);
+          src.piece = new Piece(tempSrc.nom, tempSrc.valeur, tempSrc.couleur, tempSrc.x_position, tempSrc.y_position);
+          des.piece = new Piece(tempDes.nom, tempDes.valeur, tempDes.couleur, tempDes.x_position, tempDes.y_position);
           src.html_cel.image.src = src.piece.image_src;
-          if (!echec) return true; 
-          // Il existe un coup légal
           des.html_cel.image.src = des.piece.image_src;
+          if (!echec) return true;
         }
       }
     }
