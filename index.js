@@ -10,6 +10,8 @@ for(let i=0; i<tab.length; i++){
 //Variables du jeu
 var data_play = {
   number_active: 0,
+  last_active: null,
+  legal_move: 0,
   player: 1,
   get moves_jeu(){
     let move_tab = new Array(0);
@@ -35,6 +37,7 @@ function Piece(nom, valeur, couleur, x_position, y_position){
   this.x_position = x_position;
   this.y_position = y_position;
   this.number_move = 0;
+  this.en_passant = 0;
   //Définir le joueur possedant la piece
   this.joueur = couleur=="noir"?2:couleur=="blanc"?1:0;
   //Définir les déplacements possibles
@@ -58,6 +61,12 @@ function Piece(nom, valeur, couleur, x_position, y_position){
               possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position + 1}`) 
             }
           //LE COUP EN PASSANT
+            if(checkLimites(this.x_position - 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position - 1].piece.valeur == 0) && (tab[this.y_position][this.x_position - 1].piece.joueur != this.joueur) && (tab[this.y_position][this.x_position - 1].piece.en_passant == 1) && (this.x_position - 1) == data_play.last_active.piece.x_position && this.y_position == data_play.last_active.piece.y_position ) {
+              possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position - 1}`)
+            }
+            if(checkLimites(this.x_position + 1) == 0 && checkLimites(this.y_position + facteur_joueur) == 0 && (tab[this.y_position + facteur_joueur][this.x_position + 1].piece.valeur == 0) && (tab[this.y_position][this.x_position + 1].piece.joueur != this.joueur) && (tab[this.y_position][this.x_position + 1].piece.en_passant == 1) && (this.x_position + 1) == data_play.last_active.piece.x_position && this.y_position == data_play.last_active.piece.y_position){
+              possible_tab_temp.push(`${this.y_position + facteur_joueur}${this.x_position + 1}`) 
+            }
         return [...new Set(checkCase(possible_tab_temp, this))];
 
       case("fou"):
@@ -271,7 +280,11 @@ function cliquer(el){
   if(data_play.number_active == 0 && el.piece.valeur != 0  && el.piece.joueur == data_play.player){
     //Aficher les deplacements possibles de la piece sur laquelle on clique
     el.piece.possible_moves().forEach(move => {
-      tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "solid rgba(226, 218, 223, 0.99)";
+      if(tab[parseInt(move[0])][parseInt(move[1])].piece.valeur == 0){
+        tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.boxShadow = "inset 0px 0px 20px rgba(226, 218, 223, 0.99)";
+      }else{
+        tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.boxShadow = "inset 0px 0px 20px rgba(235, 15, 15, 0.99)";
+      }
     });
     //CHANGE LE FOND de la pièce
     el.html_cel.style.background = "rgba(224, 185, 8, 0.85)";
@@ -281,7 +294,7 @@ function cliquer(el){
     highlightEchecRois();
   }else if(data_play.number_active == 1){
     //remmetre tout à son état initial
-    disPossible_refresh(data_play.first_active)
+    disPossible_refresh(data_play.first_active);
     let src = data_play.first_active;
     let des = el;
     if(src != des && src.piece.possible_moves().includes(`${des.piece.y_position}${des.piece.x_position}`)  != 0){
@@ -332,6 +345,18 @@ function deplacer(x,y){
   if(x.piece.joueur != y.piece.joueur ){
     if(!y.piece.valeur){
       x.piece.number_move++;
+      //etat en passant d'un pion
+        let facteur_joueur = Math.pow(-1, x.piece.joueur);
+        if(x.piece.nom == "pion" && x.piece.number_move == 1 && y.piece.y_position == x.piece.y_position + (2*facteur_joueur)){
+          x.piece.en_passant = 1;
+        }else{
+          x.piece.en_passant = 0;
+        }
+      //capture en passant
+        if(x.piece.nom == "pion" && x.piece.x_position != y.piece.x_position){
+          Object.assign(tab[x.piece.y_position][y.piece.x_position].piece, empty_piece); 
+          tab[x.piece.y_position][y.piece.x_position].html_cel.image.src = tab[x.piece.y_position][y.piece.x_position].piece.image_src;
+        }
       let temp = {...x.piece};
       Object.assign(x.piece, y.piece);
       Object.assign(y.piece, temp) 
@@ -339,6 +364,7 @@ function deplacer(x,y){
       y.html_cel.image.src = y.piece.image_src;
       [x.piece.x_position, x.piece.y_position] = [parseInt(x.html_cel.id[1]), parseInt(x.html_cel.id[0])];
       [y.piece.x_position, y.piece.y_position] = [parseInt(y.html_cel.id[1]), parseInt(y.html_cel.id[0])];
+      data_play.last_active = y;
     }else{
       capture(x, y);
       highlightEchecRois() 
@@ -376,7 +402,7 @@ function checkCase(possiblechecking, piece_ref, type_move){
     let y = parseInt(cases[0]);
     let x = parseInt(cases[1])
       //si c'est un pion, on check les diagonales
-      if(piece_ref.nom =="pion" && x != piece_ref.x_position && tab[y][x].piece.valeur != 0 && tab[y][x].piece.joueur != piece_ref.joueur ){
+      if(piece_ref.nom =="pion" && x != piece_ref.x_position){
         return_tab.push(`${y}${x}`)
       }
       let a;
@@ -449,7 +475,7 @@ function checkCase(possiblechecking, piece_ref, type_move){
 //Fonction pour revenir de display_posible_move
 function disPossible_refresh(el){
   el.piece.possible_moves().forEach(move => {
-    tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.border = "none";
+    tab[parseInt(move[0])][parseInt(move[1])].html_cel.style.boxShadow = "none";
   });
 }
 //Fonction pour vérifier si les 4 variables sont dans les limites
@@ -552,7 +578,30 @@ function joueurACoupLegal(joueur) {
           // Je Sauvegarde l'état
           const tempSrc = Object.assign({}, src.piece);
           const tempDes = Object.assign({}, des.piece);
-          deplacer(src, des);
+          const move_src = src.piece.number_move;
+          const move_des = des.piece.number_move;
+          //redefinition de la fonction deplacer
+          // deplacer(src, des);
+          let piece_EP = {...src.piece};
+            if(src.piece.joueur != des.piece.joueur ){
+                
+                // capture en passant
+                  if(src.piece.nom == "pion" && !des.piece.valeur && src.piece.x_position != des.piece.x_position){
+                    Object.assign(piece_EP,tab[src.piece.y_position][des.piece.x_position].piece);
+                    Object.assign(tab[src.piece.y_position][des.piece.x_position].piece, empty_piece); 
+                    tab[src.piece.y_position][des.piece.x_position].html_cel.image.src = tab[src.piece.y_position][des.piece.x_position].piece.image_src;
+                  }
+                
+                Object.assign(des.piece, src.piece)
+                Object.assign(src.piece, empty_piece); 
+                src.html_cel.image.src = src.piece.image_src;
+                des.html_cel.image.src = des.piece.image_src;
+                [src.piece.x_position, src.piece.y_position] = [parseInt(src.html_cel.id[1]), parseInt(src.html_cel.id[0])];
+                [des.piece.x_position, des.piece.y_position] = [parseInt(des.html_cel.id[1]), parseInt(des.html_cel.id[0])];  
+                
+            }else{
+              console.log("Déplacement impossible");
+            }
           const echec = isEchec(joueur);
           // j'Annule le coup
           src.piece = new Piece(tempSrc.nom, tempSrc.valeur, tempSrc.couleur, tempSrc.x_position, tempSrc.y_position);
@@ -561,6 +610,15 @@ function joueurACoupLegal(joueur) {
           src.piece.number_move = tempSrc.number_move;
           src.html_cel.image.src = src.piece.image_src;
           des.html_cel.image.src = des.piece.image_src;
+          src.piece.number_move = move_src;
+          des.piece.number_move = move_des;
+          
+          // annuler le coup en passant
+          if(src.piece.joueur != des.piece.joueur && src.piece.nom == "pion" && !des.piece.valeur && src.piece.x_position != des.piece.x_position){
+            Object.assign(tab[src.piece.y_position][des.piece.x_position].piece, piece_EP); 
+            tab[src.piece.y_position][des.piece.x_position].html_cel.image.src = tab[src.piece.y_position][des.piece.x_position].piece.image_src;
+          }
+          
           if (!echec) return true;
         }
       }
