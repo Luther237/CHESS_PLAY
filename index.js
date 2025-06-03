@@ -276,7 +276,6 @@ refresh();
 //JE PASSE AU DEPLACEMENT
 //Fonction evennement cliquer
 function cliquer(el){
-  display_piece(el);
   if(data_play.number_active == 0 && el.piece.valeur != 0  && el.piece.joueur == data_play.player){
     //Aficher les deplacements possibles de la piece sur laquelle on clique
     el.piece.possible_moves().forEach(move => {
@@ -381,18 +380,6 @@ function capture(x, y){
   [x.piece.x_position, x.piece.y_position] = [parseInt(x.html_cel.id[1]), parseInt(x.html_cel.id[0])];
   [y.piece.x_position, y.piece.y_position] = [parseInt(y.html_cel.id[1]), parseInt(y.html_cel.id[0])];  
 }
-
-//Fonction pour afficher la piece sur laquelle on clique
-function display_piece(element){
-  document.getElementById("id_image").src = element.piece.image_src;
-  document.getElementById("nom").innerHTML = `nom: ${element.piece.nom}`;
-  document.getElementById("joueur").innerHTML = `joueur: ${element.piece.joueur}`
-  document.getElementById("valeur").innerHTML = `valeur ${element.piece.valeur}`
-  document.getElementById("nombre_move").innerHTML = `nombre move: ${element.piece.number_move}`
-  document.getElementById("x").innerHTML = `x: ${element.piece.x_position}`
-  document.getElementById("y").innerHTML = `y: ${element.piece.y_position}`
-  document.getElementById("pm").innerHTML = `pm: ${element.piece.possible_moves()}`
-};
 //Fonction pour retrouver si une case est vide 
 function checkCase(possiblechecking, piece_ref, type_move){
   let return_tab = new Array(0);
