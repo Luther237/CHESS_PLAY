@@ -11,7 +11,6 @@ for(let i=0; i<tab.length; i++){
 var data_play = {
   number_active: 0,
   player: 1,
-  moves_jeu_auth: [],
   get moves_jeu(){
     let move_tab = new Array(0);
     for(let i = 0; i<tab.length; i++){
@@ -180,6 +179,8 @@ function Piece(nom, valeur, couleur, x_position, y_position){
         cava_set(this.x_position, this.y_position + 1, this, possible_tab_temp);
         cava_set(this.x_position, this.y_position - 1, this, possible_tab_temp);
       return [...new Set(possible_tab_temp)];
+      case("undefine"):
+      return [];
     }
   }
 };
@@ -283,8 +284,8 @@ function cliquer(el){
     disPossible_refresh(data_play.first_active)
     let src = data_play.first_active;
     let des = el;
-    if(src != des && find_el(src.piece.possible_moves(), des.html_cel.id) == 1){
-      deplacer(src, des);   
+    if(src != des && src.piece.possible_moves().includes(`${des.piece.y_position}${des.piece.x_position}`)  != 0){
+      deplacer(src, des);
       //Vérifier si le roi est en échec
       if(isEchec(data_play.player) == true){
         //Si le roi est en échec, on remet la piece à sa place initiale
@@ -297,13 +298,33 @@ function cliquer(el){
         highlightEchecRois();
       }
       //change le joueur autorisé
-      highlightEchecRois() 
-      data_play.player = data_play.player == 1?2:1;
+      highlightEchecRois()
+      data_play.player = data_play.player == 1?2:1; 
     }
     src.html_cel.style.background = src.html_cel.defaut_color;
     checkMatOuPat(el.piece.joueur==1?2:1);
     data_play.number_active = 0;
     highlightEchecRois();
+
+    //J'ajoute le coup roque si les conditions sont remplies
+    let p_src = src.piece;
+    let p_des = des.piece;
+    let p_roi = findRoi(data_play.player);
+    if(src != des && p_des.number_move==0 && p_src.number_move == 0 && p_src.nom == "roi" && p_des.nom == "tour"){
+      if(InterCase_isAtacked(p_src, p_des)==false && (p_src.possible_moves().includes(`${p_roi.y + 1}${p_roi.x + 1}`)==0 
+        || p_src.possible_moves().includes(`${p_roi.y - 1}${p_roi.x - 1}`) == 0)){
+        if(p_src.x_position < p_des.x_position){
+          deplacer(src, tab[p_roi.y][p_roi.x + 2]);
+          deplacer(des, tab[p_roi.y][p_roi.x + 1]);
+          data_play.player = data_play.player == 1?2:1;
+        }else{
+          deplacer(src, tab[p_roi.y][p_roi.x - 2]);
+          deplacer(des, tab[p_roi.y][p_roi.x - 1]);
+          data_play.player = data_play.player == 1?2:1;
+        }  
+      }
+      
+    }
   }
 }
 //Fonction pour PERMUTTER deux OBJETS
@@ -322,8 +343,6 @@ function deplacer(x,y){
       capture(x, y);
       highlightEchecRois() 
     }
-  }else{
-    console.log("Déplacement impossible");
   }
 }
 //Fonction capture piece 
@@ -347,16 +366,6 @@ function display_piece(element){
   document.getElementById("x").innerHTML = `x: ${element.piece.x_position}`
   document.getElementById("y").innerHTML = `y: ${element.piece.y_position}`
   document.getElementById("pm").innerHTML = `pm: ${element.piece.possible_moves()}`
-};
-
-//Fonction pour retouver un élément dans un tableau
-const find_el = (tableau, searched) => {
-  let l  = tableau.length; 
-  for(let i = 0 ; i< l; i++){
-    if(tableau[i] == searched)
-      return 1
-  }
-  return -1
 };
 //Fonction pour retrouver si une case est vide 
 function checkCase(possiblechecking, piece_ref, type_move){
@@ -540,14 +549,16 @@ function joueurACoupLegal(joueur) {
           const x = parseInt(move[1]);
           const src = tab[i][j];
           const des = tab[y][x];
-          // Sauvegarde l'état
+          // Je Sauvegarde l'état
           const tempSrc = Object.assign({}, src.piece);
           const tempDes = Object.assign({}, des.piece);
           deplacer(src, des);
           const echec = isEchec(joueur);
-          // Annule le coup
+          // j'Annule le coup
           src.piece = new Piece(tempSrc.nom, tempSrc.valeur, tempSrc.couleur, tempSrc.x_position, tempSrc.y_position);
           des.piece = new Piece(tempDes.nom, tempDes.valeur, tempDes.couleur, tempDes.x_position, tempDes.y_position);
+          des.piece.number_move = tempDes.number_move;
+          src.piece.number_move = tempSrc.number_move;
           src.html_cel.image.src = src.piece.image_src;
           des.html_cel.image.src = des.piece.image_src;
           if (!echec) return true;
@@ -557,12 +568,11 @@ function joueurACoupLegal(joueur) {
   }
   return false; // Aucun coup légal
 }
-
+//Fonction pour vérifier s'il y'a mat ou pat
 function checkMatOuPat(joueur) {
   if (isEchec(joueur)) {
     if (!joueurACoupLegal(joueur)) {
       alert("Échec et mat ! Joueur " + (joueur==1?"blanc":"noir") + " a perdu.");
-      // Ici tu peux bloquer la partie ou proposer de recommencer
     }
   } else {
     if (!joueurACoupLegal(joueur)) {
@@ -570,3 +580,28 @@ function checkMatOuPat(joueur) {
     }
   }
 }
+//Fonction pour vérifier si les cases entre le roi et les tours sont attaquées
+const InterCase_isAtacked = (p1, p2) => {
+  let x1 = p1.x_position;
+  let x2 = p2.x_position;
+  //Fonction pour vérifier une case
+  const verifier = (cas) => {
+    for(let i=0; i< tab.length; i++){
+      for(let j = 0; j < tab.length; j++){
+        let piece_ref = tab[i][j].piece;
+        if(piece_ref.joueur != p1.joueur && piece_ref.possible_moves().includes(`${p1.y_position}${cas}`))
+          return true; 
+      }
+    }
+    return false;
+  }
+  //On vérifie donc case par case
+  if((x1 < x2 && verifier(x1 + 1)==false && verifier(x1 + 2)==false)){
+    return false
+    
+  }else if(x1 > x2 && verifier(x1 - 1)==false && verifier(x1 - 2)==false && verifier(x1 - 3) == false){
+    return false
+  }
+  return true;
+}
+//Je déplace manuellement les pièces pour faire les tests
