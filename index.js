@@ -11,7 +11,6 @@ for(let i=0; i<tab.length; i++){
 var data_play = {
   number_active: 0,
   last_active: null,
-  legal_move: 0,
   player: 1,
   moves_jeu_auth: [],
   get moves_jeu(){
@@ -188,7 +187,8 @@ function Piece(nom, valeur, couleur, x_position, y_position){
         cava_set(this.x_position - 1, this.y_position - 1, this, possible_tab_temp);
         cava_set(this.x_position, this.y_position + 1, this, possible_tab_temp);
         cava_set(this.x_position, this.y_position - 1, this, possible_tab_temp);
-      return [...new Set(possible_tab_temp)];
+      // return [...new Set(possible_tab_temp)];
+      return [...new Set(checkCase(possible_tab_temp, this))];
     }
   }
 };
@@ -336,6 +336,32 @@ function deplacer(x,y){
           Object.assign(tab[x.piece.y_position][y.piece.x_position].piece, empty_piece); 
           tab[x.piece.y_position][y.piece.x_position].html_cel.image.src = tab[x.piece.y_position][y.piece.x_position].piece.image_src;
         }
+      //rock du roi et de la tour
+      if(x.piece.nom == "roi" && (y.piece.x_position == (x.piece.x_position + 2) || y.piece.x_position == (x.piece.x_position - 2))){
+        if(y.piece.x_position == (x.piece.x_position + 2)){
+          //deplacement de la tour droite
+          let tourI = tab[x.piece.y_position][x.piece.x_position + 3];
+          let tourF = tab[x.piece.y_position][x.piece.x_position + 1] ;
+          tourI.piece.number_move++;
+          Object.assign(tourF.piece, tourI.piece);
+          Object.assign(tourI.piece, empty_piece); 
+          tourI.html_cel.image.src = tourI.piece.image_src;
+          tourF.html_cel.image.src = tourF.piece.image_src;
+          [tourI.piece.x_position, tourI.piece.y_position] = [parseInt(tourI.html_cel.id[1]), parseInt(tourI.html_cel.id[0])];
+          [tourF.piece.x_position, tourF.piece.y_position] = [parseInt(tourF.html_cel.id[1]), parseInt(tourF.html_cel.id[0])]; 
+        }else{
+          //deplacement de la tour gauche
+          let tourI = tab[x.piece.y_position][x.piece.x_position - 4];
+          let tourF = tab[x.piece.y_position][x.piece.x_position - 1] ;
+          tourI.piece.number_move++;
+          Object.assign(tourF.piece, tourI.piece);
+          Object.assign(tourI.piece, empty_piece); 
+          tourI.html_cel.image.src = tourI.piece.image_src;
+          tourF.html_cel.image.src = tourF.piece.image_src;
+          [tourI.piece.x_position, tourI.piece.y_position] = [parseInt(tourI.html_cel.id[1]), parseInt(tourI.html_cel.id[0])];
+          [tourF.piece.x_position, tourF.piece.y_position] = [parseInt(tourF.html_cel.id[1]), parseInt(tourF.html_cel.id[0])]; 
+        }
+      }
       let temp = {...x.piece};
       Object.assign(x.piece, y.piece);
       Object.assign(y.piece, temp) 
@@ -427,6 +453,16 @@ function checkCase(possiblechecking, piece_ref, type_move){
           if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
             return_tab.push(`${y+j}${x+i}`);
         }
+        //ajout des cases de rock
+          if(piece_ref.nom == "roi" && y == py){
+            if(x>px){ 
+              i = 1;
+            }else{
+              i = -1;
+            }
+            if(checkLimites(y)==0 && checkLimites(x+i) == 0 && piece_ref.number_move == 0 && tab[y][x+i].piece.valeur == 0 && ((tab[y][x+i+i].piece.nom == "tour" && tab[y][x+i+i].piece.number_move == 0) || (tab[y][x+i+i].piece.valeur == 0 && tab[y][x+i+i+i].piece.nom == "tour" && tab[y][x+i+i+i].piece.number_move == 0) ))
+              return_tab.push(`${y}${x+i}`);
+          }
         if(piece_ref.nom != "pion" && piece_ref.nom != "roi" && checkLimites(y+j)==0 && checkLimites(x+i) == 0 && tab[y+j][x+i].piece.valeur != 0 && tab[y+j][x+i].piece.joueur != piece_ref.joueur)
           return_tab.push(`${y+j}${x+i}`);     
     //Si la case pointée n'est pas vide et contient une pièce de l'adversaire
